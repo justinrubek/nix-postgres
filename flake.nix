@@ -106,6 +106,7 @@
           ./ext/wrappers/default.nix
           ./ext/supautils.nix
           ./ext/plv8.nix
+          ./ext/pgx_ulid.nix
         ];
 
         # Create a 'receipt' file for a given postgresql package. This is a way
