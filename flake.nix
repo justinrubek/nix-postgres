@@ -452,6 +452,7 @@
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             coreutils just nix-update
+            pkgs.skopeo
             pg_prove shellcheck
 
             basePackages.start-server
