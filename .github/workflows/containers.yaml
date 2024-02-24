@@ -37,11 +37,12 @@ jobs:
         env:
           USERNAME: ${{ github.actor }}
           PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        run: echo ${PASSWORD} | nix develop .#ci -c skopeo login ghcr.io -u ${USERNAME} --password-stdin
+        run: echo ${PASSWORD} | nix develop -c skopeo login ghcr.io -u ${USERNAME} --password-stdin
 
       - name: push to registry
         env:
           REPO_OWNER: justinrubek
           REPO_NAME: ${{ inputs.repository_name }}
           VERSION: ${{ github.sha }}
-        run: nix develop .#ci -c skopeo copy docker-archive:result docker://${REPO_OWNER}/${REPO_NAME}:${VERSION} --insecure-policy
+          PACKAGE_NAME: ${{ inputs.image_name }}
+        run: nix run .#${PACKAGE_NAME}.copyTo docker://ghcr.io/${REPO_OWNER}/${REPO_NAME}:${VERSION}
