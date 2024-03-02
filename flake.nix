@@ -174,6 +174,7 @@
           in pkgs.symlinkJoin {
             inherit (pgbin) name version;
             paths = [ pgbin (makeReceipt pgbin upstreamExts ourExts) ];
+            passthru = { psqlSchema = pgbin.psqlSchema; };
           };
 
         # Make a Docker Image from a given PostgreSQL version and binary package.
