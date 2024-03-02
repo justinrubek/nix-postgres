@@ -5,9 +5,10 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     nix2container.url = "github:nlewo/nix2container";
+    pgx-ulid.url = "github:justinrubek/pgx_ulid";
   };
 
-  outputs = { self, nixpkgs, flake-utils, nix2container }: let
+  outputs = inputs@{ self, nixpkgs, flake-utils, nix2container, ... }: let
     gitRev = "vcs=${self.shortRev or "dirty"}+${builtins.substring 0 8 (self.lastModifiedDate or self.lastModified or "19700101")}";
 
     ourSystems = with flake-utils.lib; [
@@ -96,7 +97,11 @@
           ./ext/wrappers/default.nix
           ./ext/supautils.nix
           ./ext/plv8.nix
-          ./ext/pgx_ulid.nix
+        ];
+
+        # extensions build via nix
+        flakeExtensions = [
+          inputs.pgx-ulid.packages.${system}.pgx_ulid
         ];
 
         # Create a 'receipt' file for a given postgresql package. This is a way
@@ -164,7 +169,7 @@
             ourExts = map (ext: { name = ext.pname; version = ext.version; }) (makeOurPostgresPkgs version);
 
             pgbin = postgresql.withPackages (ps:
-              (map (ext: ps."${ext}") psqlExtensions) ++ (makeOurPostgresPkgs version)
+              (map (ext: ps."${ext}") psqlExtensions) ++ (makeOurPostgresPkgs version) ++ flakeExtensions
             );
           in pkgs.symlinkJoin {
             inherit (pgbin) name version;
